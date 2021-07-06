@@ -5,20 +5,46 @@ import { useQuery } from '@apollo/client';
 import { QUERY_PRODUCTS } from '../utils/queries';
 import spinner from '../assets/spinner.gif';
 
+import { useStoreContext } from "../utils/GlobalState";
+import { UPDATE_PRODUCTS } from "../utils/actions";
+
+
 function Detail() {
-  const { id } = useParams();
+  // const { id } = useParams();
 
-  const [currentProduct, setCurrentProduct] = useState({});
+  // const [currentProduct, setCurrentProduct] = useState({});
 
-  const { loading, data } = useQuery(QUERY_PRODUCTS);
+  // const { loading, data } = useQuery(QUERY_PRODUCTS);
 
-  const products = data?.products || [];
+  // const products = data?.products || [];
 
-  useEffect(() => {
-    if (products.length) {
-      setCurrentProduct(products.find((product) => product._id === id));
-    }
-  }, [products, id]);
+  // useEffect(() => {
+  //   if (products.length) {
+  //     setCurrentProduct(products.find((product) => product._id === id));
+  //   }
+  // }, [products, id]);
+
+const [state, dispatch] = useStoreContext();
+const { id } = useParams();
+
+const [currentProduct, setCurrentProduct] = useState({})
+
+const { loading, data } = useQuery(QUERY_PRODUCTS);
+
+const { products } = state;
+
+useEffect(() => {
+  if (products.length) {
+    //setting the currentProduct by matching the id from useParams
+    setCurrentProduct(products.find(product => product._id === id));
+  } else if (data) {
+    //if notyhinh in global state, use data from useQuery
+    dispatch({
+      type: UPDATE_PRODUCTS,
+      products: data.products
+    });
+  }
+}, [products, data, dispatch, id]);
 
   return (
     <>
