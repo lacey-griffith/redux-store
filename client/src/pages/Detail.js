@@ -6,8 +6,9 @@ import { QUERY_PRODUCTS } from '../utils/queries';
 import spinner from '../assets/spinner.gif';
 
 import { useStoreContext } from "../utils/GlobalState";
-import { UPDATE_PRODUCTS } from "../utils/actions";
+import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY, ADD_TO_CART, UPDATE_PRODUCTS } from "../utils/actions";
 
+import Cart from '../components/Cart';
 
 function Detail() {
   // const { id } = useParams();
@@ -24,27 +25,38 @@ function Detail() {
   //   }
   // }, [products, id]);
 
-const [state, dispatch] = useStoreContext();
-const { id } = useParams();
+  const [state, dispatch] = useStoreContext();
+  const { id } = useParams();
 
-const [currentProduct, setCurrentProduct] = useState({})
+  const [currentProduct, setCurrentProduct] = useState({})
 
-const { loading, data } = useQuery(QUERY_PRODUCTS);
+  const { loading, data } = useQuery(QUERY_PRODUCTS);
 
-const { products } = state;
+  const { products } = state;
 
-useEffect(() => {
-  if (products.length) {
-    //setting the currentProduct by matching the id from useParams
-    setCurrentProduct(products.find(product => product._id === id));
-  } else if (data) {
-    //if notyhinh in global state, use data from useQuery
+  useEffect(() => {
+    //checking if data in global products array
+    //determine which product_id to look at
+    if (products.length) {
+      //setting the currentProduct by matching the id from useParams
+      setCurrentProduct(products.find(product => product._id === id));
+    } else if (data) {
+      //if nothing in global state products array, use data from useQuery AND save it globally
+      //so the next time this is ran through, there will be products in the array
+      //and we can set the current prodcut to this one
+      dispatch({
+        type: UPDATE_PRODUCTS,
+        products: data.products
+      });
+    }
+  }, [products, data, dispatch, id]);
+
+  const addToCart = () => {
     dispatch({
-      type: UPDATE_PRODUCTS,
-      products: data.products
+      type: ADD_TO_CART,
+      product: { ...currentProduct, purchaseQuantity: 1 }
     });
-  }
-}, [products, data, dispatch, id]);
+  };
 
   return (
     <>
@@ -58,7 +70,7 @@ useEffect(() => {
 
           <p>
             <strong>Price:</strong>${currentProduct.price}{' '}
-            <button>Add to Cart</button>
+            <button onClick={addToCart}>Add to Cart</button>
             <button>Remove from Cart</button>
           </p>
 
@@ -69,6 +81,7 @@ useEffect(() => {
         </div>
       ) : null}
       {loading ? <img src={spinner} alt="loading" /> : null}
+      <Cart/>
     </>
   );
 }

@@ -24,10 +24,12 @@ function ProductList() {
   // }
 
   const [state, dispatch] = useStoreContext();
+  //deconstuct currentCategory from the state object
   const { currentCategory } = state;
   const { loading, data } = useQuery(QUERY_PRODUCTS)
 
   useEffect(() => {
+    //if data from the query is here, dispatch 
     if(data){
       dispatch({
         type: UPDATE_PRODUCTS,
