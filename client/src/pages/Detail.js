@@ -10,20 +10,10 @@ import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY, ADD_TO_CART, UPDATE_PRODUCTS } 
 
 import Cart from '../components/Cart';
 
+//import indexdb helper function
+import { idbPromise } from '../utils/helpers'
+
 function Detail() {
-  // const { id } = useParams();
-
-  // const [currentProduct, setCurrentProduct] = useState({});
-
-  // const { loading, data } = useQuery(QUERY_PRODUCTS);
-
-  // const products = data?.products || [];
-
-  // useEffect(() => {
-  //   if (products.length) {
-  //     setCurrentProduct(products.find((product) => product._id === id));
-  //   }
-  // }, [products, id]);
 
   const [state, dispatch] = useStoreContext();
   const { id } = useParams();
@@ -48,8 +38,21 @@ function Detail() {
         type: UPDATE_PRODUCTS,
         products: data.products
       });
+
+      //save data into indexdb
+      data.products.forEach((product) => {
+        idbPromise('products', 'put', product)
+      })
+    } else if(!loading){
+      //if we are offline
+      idbPromise('products', 'get').then((indexedProducts) => {
+        dispatch({
+          type: UPDATE_PRODUCTS,
+          products: indexedProducts
+        })
+      })
     }
-  }, [products, data, dispatch, id]);
+  }, [products, data, loading, dispatch, id]);
 
   const addToCart = () => {
 

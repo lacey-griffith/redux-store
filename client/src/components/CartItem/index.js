@@ -3,11 +3,9 @@ import { useStoreContext } from '../../utils/GlobalState';
 import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY } from '../../utils/actions';
 
 const CartItem = ({ item }) => {
-    const [state , dispatch] = useStoreContext()
-    const { cart } = state;
+    const [,dispatch] = useStoreContext()
 
     const removeFromCart = item => {
-        console.log(item)
         if(item.purchaseQuantity - 1 > 0){
             dispatch({
                 type: UPDATE_CART_QUANTITY,
