@@ -70,10 +70,21 @@ function Detail() {
   };
 
   const removeFromCart = () => {
-    dispatch({
-      type: REMOVE_FROM_CART,
-      _id: currentProduct._id
+    const itemToRemove = cart.find((cartItem) => cartItem._id === id)
+    console.log(itemToRemove.purchaseQuantity)
+
+    if(itemToRemove.purchaseQuantity - 1 > 0){
+      dispatch({
+        type: UPDATE_CART_QUANTITY,
+        _id: itemToRemove._id,
+        purchaseQuantity: parseInt(itemToRemove.purchaseQuantity) -1
     })
+    } else {
+      dispatch({
+        type: REMOVE_FROM_CART,
+        _id: currentProduct._id
+      })
+    }
   }
 
   return (
