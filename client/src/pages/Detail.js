@@ -12,6 +12,7 @@ import Cart from '../components/Cart';
 
 //import indexdb helper function
 import { idbPromise } from '../utils/helpers'
+import { parse, parseType } from 'graphql';
 
 function Detail() {
 
@@ -55,7 +56,6 @@ function Detail() {
   }, [products, data, loading, dispatch, id]);
 
   const addToCart = () => {
-
     const itemInCart = cart.find((cartItem) => cartItem._id === id)
 
     if(itemInCart){
@@ -64,17 +64,22 @@ function Detail() {
         _id: id,
         purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1
       })
+      //if updating quantity of existing item in the cart use existing item data and increment
+      idbPromise('cart','put', {
+        ...itemInCart,
+        purchaseQuantity: parseInt(itemInCart.purchaseQuantity) + 1 })
       } else {
       dispatch({
         type: ADD_TO_CART,
         product: { ...currentProduct, purchaseQuantity: 1 }
       })
+      //if product isnt in the car, add it to the current shopping cart in indexdb offline state
+      idbPromise('cart', 'put', {...currentProduct, purchaseQuantity: 1})
     }
   };
 
   const removeFromCart = () => {
     const itemToRemove = cart.find((cartItem) => cartItem._id === id)
-    console.log(itemToRemove.purchaseQuantity)
 
     if(itemToRemove.purchaseQuantity - 1 > 0){
       dispatch({
@@ -82,11 +87,15 @@ function Detail() {
         _id: itemToRemove._id,
         purchaseQuantity: parseInt(itemToRemove.purchaseQuantity) -1
     })
+    //updating current item in the cart
+    idbPromise('cart', 'put', {...itemToRemove, purchaseQuantity: parseInt(itemToRemove.purchaseQuantity) - 1 })
     } else {
       dispatch({
         type: REMOVE_FROM_CART,
         _id: currentProduct._id
       })
+      //delete the item from indexdb
+      idbPromise('cart', 'delete', { ...currentProduct })
     }
   }
 

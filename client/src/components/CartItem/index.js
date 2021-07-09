@@ -2,6 +2,9 @@ import React from 'react';
 import { useStoreContext } from '../../utils/GlobalState';
 import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY } from '../../utils/actions';
 
+//import indexdb helper function to update cart data
+import { idbPromise } from '../../utils/helpers';
+
 const CartItem = ({ item }) => {
     const [,dispatch] = useStoreContext()
 
@@ -12,33 +15,15 @@ const CartItem = ({ item }) => {
                 _id: item._id,
                 purchaseQuantity: parseInt(item.purchaseQuantity) - 1
             })
+            idbPromise('cart','put', { ...item, purchaseQuantity: parseInt(item.purchaseQuantity) - 1 })
         } else {
             dispatch({
                 type: REMOVE_FROM_CART,
                 _id: item._id
             })
+            idbPromise('cart','delete', {...item})
         }
     };
-
-    // const removeFromCart = (item) => {
-    //     console.log(item)
-    //     const itemToRemove = cart.find((cartItem) => cartItem._id === id)
-    //     console.log(itemToRemove.purchaseQuantity)
-    
-    //     if(itemToRemove.purchaseQuantity - 1 > 0){
-    //       dispatch({
-    //         type: UPDATE_CART_QUANTITY,
-    //         _id: itemToRemove._id,
-    //         purchaseQuantity: parseInt(itemToRemove.purchaseQuantity) -1
-    //     })
-    //     } else {
-    //       dispatch({
-    //         type: REMOVE_FROM_CART,
-    //         _id: itemToRemove._id
-    //       })
-    //     }
-    //   }
-
 
     const onChange = (e) => {
         const value = e.target.value;
@@ -48,12 +33,14 @@ const CartItem = ({ item }) => {
                 type: REMOVE_FROM_CART,
                 _id: item._id
             })
+            idbPromise('cart','delete', {...item})
         } else {
             dispatch({
                 type: UPDATE_CART_QUANTITY,
                 _id: item._id,
                 purchaseQuantity: parseInt(value)
             })
+            idbPromise('cart','put', {...item, purchaseQuantity: parseInt(value)})
         }
     }
 
