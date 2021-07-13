@@ -1,7 +1,10 @@
 import React, { useEffect } from 'react';
+import { useLazyQuery } from '@apollo/client';
+import { loadStripe } from '@stripe/stripe-js'
 
 import { useStoreContext } from '../../utils/GlobalState';
 import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
+import { QUERY_CHECKOUT } from '../../utils/queries'
 
 import CartItem from '../CartItem';
 import Auth from '../../utils/auth';
@@ -10,10 +13,18 @@ import './style.css'
 //import indexdb to make cart persistent
 import { idbPromise } from '../../utils/helpers'
 
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
+
 const Cart = () => {
     //establish state variable
     const [ state, dispatch ] = useStoreContext();
     
+    //establish lazy query for using submit checkout query
+    //the data variable will contain the session id but only after the 
+    //query is called in submitCheckout function
+    const [getCheckout, { data }] = useLazyQuery(QUERY_CHECKOUT)
+
+
     useEffect(() => {
         async function getCart(){
             const cart = await idbPromise('cart', 'get')
@@ -33,6 +44,7 @@ const Cart = () => {
     function toggleCart(){
         dispatch({ type: TOGGLE_CART })
     }
+
     function calcTotal(){
         let sum = 0
         state.cart.forEach(item => {
@@ -40,6 +52,31 @@ const Cart = () => {
         })
         return sum.toFixed(2)
     }
+
+    //on click of checkout button 
+    //loop over items saved in state.cart and add their product ids to the new productIds array
+    //QUERY_CHECKOUT will use this array to generate a stripe session
+    function submitCheckout() {
+        const productIds = []
+
+        state.cart.forEach((item => {
+            for(let i = 0; i < item.purchaseQuantity; i++){
+                productIds.push(item._id)
+            }
+        }))
+
+        getCheckout({
+            variables: { products: productIds}
+        })
+    }
+    //watch for changes to the data being returned from the QUERY_CHECKOUT call
+    useEffect(() => {
+        if(data){
+            stripePromise.then((res) => {
+                res.redirectToCheckout({ sessionId: data.checkout.session })
+            })
+        }
+    }, [data])
 
     //if the cart is close (cartOpen: false) then display the shopping cart icon
     if(!state.cartOpen){
@@ -64,7 +101,7 @@ const Cart = () => {
                 <strong>Total: ${calcTotal()}</strong>
                 {
                 Auth.loggedIn() ?
-                    <button>
+                    <button onClick={submitCheckout}>
                     Checkout
                     </button>
                     :

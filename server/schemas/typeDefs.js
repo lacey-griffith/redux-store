@@ -1,6 +1,12 @@
 const { gql } = require('apollo-server-express');
 
+
+// add checkout session
 const typeDefs = gql`
+  type Checkout {
+    session: ID
+  }
+
   type Category {
     _id: ID
     name: String
@@ -41,6 +47,7 @@ const typeDefs = gql`
     product(_id: ID!): Product
     user: User
     order(_id: ID!): Order
+    checkout(products: [ID]!): Checkout
   }
 
   type Mutation {

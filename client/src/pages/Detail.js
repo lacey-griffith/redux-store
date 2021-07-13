@@ -12,7 +12,6 @@ import Cart from '../components/Cart';
 
 //import indexdb helper function
 import { idbPromise } from '../utils/helpers'
-import { parse, parseType } from 'graphql';
 
 function Detail() {
 
