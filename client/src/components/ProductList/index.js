@@ -1,31 +1,20 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@apollo/client';
 
-import ProductItem from '../ProductItem';
 import { QUERY_PRODUCTS } from '../../utils/queries';
-import spinner from '../../assets/spinner.gif';
-
-import { useStoreContext } from '../../utils/GlobalState';
 import { UPDATE_PRODUCTS } from '../../utils/actions'
-
 import { idbPromise } from '../../utils/helpers'
 
+import ProductItem from '../ProductItem';
+import spinner from '../../assets/spinner.gif';
+
+import { useSelector, useDispatch } from 'react-redux'
+
 function ProductList() {
-  // const { loading, data } = useQuery(QUERY_PRODUCTS);
 
-  // const products = data?.products || [];
-
-  // function filterProducts() {
-  //   if (!currentCategory) {
-  //     return products;
-  //   }
-
-  //   return products.filter(
-  //     (product) => product.category._id === currentCategory
-  //   );
-  // }
-
-  const [state, dispatch] = useStoreContext();
+  const state = useSelector(state => state)
+  const dispatch = useDispatch()
+  console.log(state)
   //deconstuct currentCategory from the state object
   const { currentCategory } = state;
   const { loading, data } = useQuery(QUERY_PRODUCTS)

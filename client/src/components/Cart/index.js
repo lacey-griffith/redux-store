@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { loadStripe } from '@stripe/stripe-js'
 
-import { useStoreContext } from '../../utils/GlobalState';
+
 import { TOGGLE_CART, ADD_MULTIPLE_TO_CART } from '../../utils/actions';
 import { QUERY_CHECKOUT } from '../../utils/queries'
 
@@ -13,11 +13,15 @@ import './style.css'
 //import indexdb to make cart persistent
 import { idbPromise } from '../../utils/helpers'
 
+//import redux
+import { useSelector, useDispatch } from 'react-redux';
+
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 const Cart = () => {
     //establish state variable
-    const [ state, dispatch ] = useStoreContext();
+    const state = useSelector(state => state)
+    const dispatch = useDispatch()
     
     //establish lazy query for using submit checkout query
     //the data variable will contain the session id but only after the 

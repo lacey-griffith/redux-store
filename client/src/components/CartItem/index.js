@@ -1,12 +1,14 @@
 import React from 'react';
-import { useStoreContext } from '../../utils/GlobalState';
 import { REMOVE_FROM_CART, UPDATE_CART_QUANTITY } from '../../utils/actions';
 
 //import indexdb helper function to update cart data
 import { idbPromise } from '../../utils/helpers';
 
+//import redux
+import { useDispatch } from 'react-redux';
+
 const CartItem = ({ item }) => {
-    const [,dispatch] = useStoreContext()
+    const dispatch = useDispatch()
 
     const removeFromCart = item => {
         if(item.purchaseQuantity - 1 > 0){

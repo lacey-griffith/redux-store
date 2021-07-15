@@ -9,7 +9,7 @@ export function pluralize(name, count) {
 export function idbPromise(storeName, method, object){
   return new Promise((resolve, reject)  => {
     // open connection to the database
-    const request = window.indexedDB.open('shop-shop', 1)
+    const request = window.indexedDB.open('redux-store', 1)
     // create variables to hold reference to the database
     let db
     let tx
