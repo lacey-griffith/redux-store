@@ -40,5 +40,8 @@ The item is then added to the cart in the user's choise of quantity
 When 'checkout' is clicked, the user is redirected to the payment page via stripe.
 ![Site Image](client/public/site_images/CheckoutWithStripe.png)
 
+Once the payment is confirmed, the user sees a success page before being redirected to the home page
+![Site Image](client/public/site_images/SuccessPage.png)
+
 A user can view past purchases by clicking on 'order history'
 ![Site Image](client/public/site_images/OrderHistory.png)
